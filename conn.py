@@ -17,3 +17,7 @@ def create_connection(db_file):
         print(e)
 
     return conn
+
+conn = create_connection("database.db")
+
+cur = conn.cursor()
