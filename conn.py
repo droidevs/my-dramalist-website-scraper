@@ -56,4 +56,21 @@ CREATE TABLE IF NOT EXISTS drama_tags (
 );
 """)
 
+conn.execute("""
+CREATE TABLE IF NOT EXISTS casts (
+    cast_id INTEGER PRIMARY KEY,      -- MDL person id (from /people/xxxxx)
+    name TEXT UNIQUE
+);
+""")
+conn.execute("""
+CREATE TABLE IF NOT EXISTS drama_casts (
+    drama_id INTEGER,
+    cast_id INTEGER,
+    role TEXT,
+    PRIMARY KEY (drama_id, cast_id, role),
+    FOREIGN KEY (drama_id) REFERENCES dramas(drama_id),
+    FOREIGN KEY (cast_id) REFERENCES casts(cast_id)
+);
+""")
+
 cur = conn.cursor()
