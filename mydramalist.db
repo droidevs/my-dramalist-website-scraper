@@ -1,29 +1,4 @@
-# This file will handle the database connection.
-import sqlite3
-from sqlite3 import Error
-
-
-def create_connection(db_file):
-    """ create a database connection to the SQLite database
-        specified by db_file
-    :param db_file: database file
-    :return: Connection object or None
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(db_file)
-        return conn
-    except Error as e:
-        print(e)
-
-    return conn
-
-conn = create_connection("database.db")
-cache = open("mydramalist.db","r")
-conn.executescript(cache.read())
-'''
-conn.execute("""
-CREATE TABLE IF NOT EXISTS dramas (
+CREATE TABLE dramas (
     drama_id INTEGER PRIMARY KEY,      -- MDL ID (e.g. 49231)
     title TEXT,
     native_title TEXT,
@@ -40,32 +15,26 @@ CREATE TABLE IF NOT EXISTS dramas (
     description TEXT,
     url TEXT UNIQUE
 );
-""")
 
-conn.execute("""
-CREATE TABLE IF NOT EXISTS tags (
+CREATE TABLE tags (
     tag_id INTEGER PRIMARY KEY,       -- MDL tag id (from "th=" in link)
     name TEXT UNIQUE
 );
-""")
-conn.execute("""
-CREATE TABLE IF NOT EXISTS drama_tags (
+
+CREATE TABLE drama_tags (
     drama_id INTEGER,
     tag_id INTEGER,
     PRIMARY KEY (drama_id, tag_id),
     FOREIGN KEY (drama_id) REFERENCES dramas(drama_id),
     FOREIGN KEY (tag_id) REFERENCES tags(tag_id)
 );
-""")
 
-conn.execute("""
-CREATE TABLE IF NOT EXISTS casts (
+CREATE TABLE casts (
     cast_id INTEGER PRIMARY KEY,      -- MDL person id (from /people/xxxxx)
     name TEXT UNIQUE
 );
-""")
-conn.execute("""
-CREATE TABLE IF NOT EXISTS drama_casts (
+
+CREATE TABLE drama_casts (
     drama_id INTEGER,
     cast_id INTEGER,
     role TEXT,
@@ -73,6 +42,3 @@ CREATE TABLE IF NOT EXISTS drama_casts (
     FOREIGN KEY (drama_id) REFERENCES dramas(drama_id),
     FOREIGN KEY (cast_id) REFERENCES casts(cast_id)
 );
-""")
-'''
-cur = conn.cursor()
