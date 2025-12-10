@@ -20,4 +20,24 @@ def create_connection(db_file):
 
 conn = create_connection("database.db")
 
+conn.execute("""
+CREATE TABLE IF NOT EXISTS dramas (
+    drama_id INTEGER PRIMARY KEY,      -- MDL ID (e.g. 49231)
+    title TEXT,
+    native_title TEXT,
+    aka_titles TEXT,
+    year INTEGER,
+    country TEXT,
+    type TEXT,
+    episodes INTEGER,
+    duration TEXT,
+    rating REAL,
+    ranked INTEGER,
+    popularity INTEGER,
+    content_rating TEXT,
+    description TEXT,
+    url TEXT UNIQUE
+);
+""")
+
 cur = conn.cursor()
