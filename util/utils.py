@@ -33,7 +33,7 @@ def slugify(text):
 def extract_drama_id(url):
     # From https://mydramalist.com/12345-move-to-heaven → "12345"
     parts = urlparse(url).path.strip("/").split("-")
-    return parts[0] if parts else None
+    return parts[0] if parts else int(re.search(r"/(\d+)-", url).group(1))
 
 def safe_find(selector, attr="text", xpath= False):
     """Safe extractor for Selenium elements."""

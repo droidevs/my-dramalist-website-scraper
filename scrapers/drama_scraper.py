@@ -1,6 +1,6 @@
 # This file will contain the code to scrape drama details.
 from config import driver, debug
-from util.utils import safe_find
+from util.utils import safe_find, extract_drama_id
 from conn import conn, cur
 import time, re
 from selenium.webdriver.common.by import By
@@ -12,7 +12,7 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
     try:
         driver.get(url)
         # drama_id from URL
-        drama_id = int(re.search(r"/(\d+)-", url).group(1))
+        drama_id = extract_drama_id(url)
 
         # Title & metadata
         title = safe_find("h1.film-title")
