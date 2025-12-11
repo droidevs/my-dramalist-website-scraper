@@ -27,6 +27,35 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
         description = safe_find("div.show-synopsis")
         if debug:
             print(f"4. desc retrieved : {description}")
+        details = driver.find_elements(By.CSS_SELECTOR, ".show-detailsxss li")
+        year, country, dtype, episodes, duration, content_rating, ranked, popularity, rating = \
+            None, None, None, None, None, None, None, None, None
+
+        for li in details:
+            txt = li.text.strip()
+            print(txt)
+            if txt.startswith("Country:"):
+                country = txt.replace("Country:", "").strip()
+            elif txt.startswith("Type:"):
+                dtype = txt.replace("Type:", "").strip()
+            elif txt.startswith("Episodes:"):
+                episodes = int(re.sub(r"\D", "", txt.replace("Episodes:", "").strip()) or 0)
+            elif txt.startswith("Duration:"):
+                duration = txt.replace("Duration:", "").strip()
+            elif txt.startswith("Content Rating:"):
+                content_rating = txt.replace("Content Rating:", "").strip()
+            elif txt.startswith("Ranked:"):
+                ranked = int(re.sub(r"\D", "", txt.replace("Ranked:", "")) or 0)
+            elif txt.startswith("Popularity:"):
+                popularity = int(re.sub(r"\D", "", txt.replace("Popularity:", "")) or 0)
+            elif txt.startswith("Aired:"):
+                match = re.search(r"\b(\d{4})\b", txt)
+                if match:
+                    year = int(match.group(1))
+            elif txt.startswith("Score:"):
+                match = re.search(r"([\d.]+)", txt)
+                if match:
+                    rating = float(match.group(1))
 
     except WebDriverException as e:
         print(f"⚠️ Error scraping {url}, retrying... attempt {retries+1}")
