@@ -119,6 +119,17 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
 
                     if debug:
                         print(f"{role_name} -> {cast_name} ({role_detail})")
+                    
+                    # insert person
+                    cur.execute(
+                        "INSERT OR IGNORE INTO casts (cast_id, name) VALUES (?, ?)",
+                        (cast_id, cast_name)
+                    )
+                    # relation
+                    cur.execute(
+                        "INSERT OR IGNORE INTO drama_casts (drama_id, cast_id, role) VALUES (?, ?, ?)",
+                        (drama_id, cast_id, role_detail)
+                    )
 
                 except Exception as e:
                     print("Skipping an entry:", e)
