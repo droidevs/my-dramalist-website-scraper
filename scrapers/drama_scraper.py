@@ -66,7 +66,6 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
         """, (drama_id, title, native_title, aka_titles, year, country, dtype,
               episodes, duration, rating, ranked, popularity, content_rating,
               description, url))
-        conn.commit()
 
         # ---------- TAGS ----------
         tags = driver.find_elements(By.CSS_SELECTOR, "li.show-tags span a")
@@ -80,6 +79,13 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
             cur.execute("INSERT OR IGNORE INTO tags (tag_id, name) VALUES (?, ?)", (tag_id, tag_name))
             # relation
             cur.execute("INSERT OR IGNORE INTO drama_tags (drama_id, tag_id) VALUES (?, ?)", (drama_id, tag_id))
+
+        # ---------- CAST ----------
+        # open cast page explicitly
+        cast_url = url + "/cast"
+        driver.get(cast_url)
+        #time.sleep(2)
+
         conn.commit()
         
         print(f" page {page} drama {drn} -> ✅ Scraped drama {title} ({drama_id})")
