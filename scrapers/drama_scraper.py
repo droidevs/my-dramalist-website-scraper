@@ -86,6 +86,44 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
         driver.get(cast_url)
         #time.sleep(2)
 
+        # find the box-body containing cast/crew info
+        box_body = driver.find_element(By.CSS_SELECTOR, "div.box-body")
+
+        # get all role sections
+        sections = box_body.find_elements(By.CSS_SELECTOR, "h3.header.b-b.p-b")
+
+        for section in sections:
+            role_name = section.text.strip()  # e.g., "Director", "Composer", "Main Role", etc.
+
+            # the corresponding <ul> is the next sibling
+            ul = section.find_element(By.XPATH, "following-sibling::ul[1]")
+            li_items = ul.find_elements(By.CSS_SELECTOR, "li.list-item")
+
+            for li in li_items:
+                try:
+                    a_tag = li.find_element(By.CSS_SELECTOR, "a.text-primary")
+                    cast_name = a_tag.text.strip()
+                    href = a_tag.get_attribute("href")
+                    cast_id_match = re.search(r"/people/(\d+)", href)
+                    if cast_id_match:
+                        cast_id = int(cast_id_match.group(1))
+                    else:
+                        continue
+
+                    # sometimes the role is in a small tag inside the div
+                    role_detail = ""
+                    try:
+                        role_detail = li.find_element(By.CSS_SELECTOR, "small").text.strip()
+                    except:
+                        role_detail = role_name  # fallback to section name
+
+                    if debug:
+                        print(f"{role_name} -> {cast_name} ({role_detail})")
+
+                except Exception as e:
+                    print("Skipping an entry:", e)
+                    continue
+
         conn.commit()
         
         print(f" page {page} drama {drn} -> ✅ Scraped drama {title} ({drama_id})")
