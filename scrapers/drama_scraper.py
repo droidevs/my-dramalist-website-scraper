@@ -1,6 +1,7 @@
 # This file will contain the code to scrape drama details.
 from config import driver, debug
 from util.utils import safe_find
+from conn import conn, cur
 import time, re
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import WebDriverException
@@ -56,7 +57,19 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
                 match = re.search(r"([\d.]+)", txt)
                 if match:
                     rating = float(match.group(1))
+        # Save drama
+        cur.execute("""
+            INSERT OR REPLACE INTO dramas
+            (drama_id, title, native_title, aka_titles, year, country, type, episodes,
+             duration, rating, ranked, popularity, content_rating, description, url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (drama_id, title, native_title, aka_titles, year, country, dtype,
+              episodes, duration, rating, ranked, popularity, content_rating,
+              description, url))
+        conn.commit()
+        print(f" page {page} drama {drn} -> ✅ Scraped drama {title} ({drama_id})")
 
+    # ... exception handling
     except WebDriverException as e:
         print(f"⚠️ Error scraping {url}, retrying... attempt {retries+1}")
         print(e.msg)
