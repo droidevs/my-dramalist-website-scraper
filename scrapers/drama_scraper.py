@@ -67,6 +67,21 @@ def scrape_drama(page= 0,drn = 0,url="", retries=0):
               episodes, duration, rating, ranked, popularity, content_rating,
               description, url))
         conn.commit()
+
+        # ---------- TAGS ----------
+        tags = driver.find_elements(By.CSS_SELECTOR, "li.show-tags span a")
+        for t in tags:
+            tag_name = t.text.strip()
+            href = t.get_attribute("href")
+            tag_id = int(re.search(r"th=(\d+)", href).group(1))
+            if debug:
+                print(f"tag {tag_id} -> {tag_name}")
+            # insert tag
+            cur.execute("INSERT OR IGNORE INTO tags (tag_id, name) VALUES (?, ?)", (tag_id, tag_name))
+            # relation
+            cur.execute("INSERT OR IGNORE INTO drama_tags (drama_id, tag_id) VALUES (?, ?)", (drama_id, tag_id))
+        conn.commit()
+        
         print(f" page {page} drama {drn} -> ✅ Scraped drama {title} ({drama_id})")
 
     # ... exception handling
